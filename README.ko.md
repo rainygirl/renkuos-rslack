@@ -10,12 +10,13 @@ R Chromium을 씁니다. 로그인은 Slack 데스크톱 앱과 같은 방식입
 ## pkgman으로 설치
 
 ```sh
-pkgman add-repo https://pkgman.rainygirl.com/x86_64    # 또는 arm64
+pkgman add-repo https://pkgman.rainygirl.com/x86_64    # 또는 arm64, x86_gcc2
 pkgman install rslack                                   # R Chromium도 함께 설치
 ```
 
-32비트 x86(x86_gcc2)용은 아직 없습니다. 그곳의 R Chromium은 Chromium 114인데,
-Slack이 이 버전을 더 이상 지원하지 않아 "Please update your browser"를 띄웁니다.
+32비트 x86(x86_gcc2)의 R Chromium은 Chromium 114이고, Slack은 이 버전을 더 이상
+지원하지 않습니다. R Slack이 여는 창(앱 창과 로그인 브라우저)은 user agent에서
+더 새로운 Chrome이라고 밝힙니다. rchromium_x86 114.0.5735.199-16 이상이 필요합니다.
 
 ## 로그인
 

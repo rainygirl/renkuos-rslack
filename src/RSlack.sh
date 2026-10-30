@@ -24,6 +24,19 @@ APP_SIG="application/x-vnd.rainygirl-RSlack"
 PROFILE="$HOME/config/settings/RSlack"
 CLIENT_URL="https://app.slack.com/client"
 SIGNIN_URL="https://slack.com/ssb/signin"
+
+# R Chromium on 32-bit x86 is Chromium 114, and Slack answers anything older
+# than Chrome 138 with "Please update your browser" (in the app window) or
+# "This browser is no longer supported" (at sign-in). The windows R Slack
+# starts, the app and the sign-in browser, say a newer version; R Chromium
+# started by itself still tells the truth. The 114 build honours --user-agent
+# from 114.0.5735.199-16 on.
+UA_ARG=
+case "$(uname -m)" in
+	BePC|i*86)
+		UA_ARG="--user-agent=Mozilla/5.0 (Haiku; Haiku BePC) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36"
+		;;
+esac
 # content_shell opens 800x600 otherwise; this fits a 1600x768 VAIO P screen.
 WINDOW_SIZE="--content-shell-host-window-size=1100x700"
 
@@ -133,6 +146,7 @@ open_window()
 		--data-path="$PROFILE" \
 		--user-data-dir="$PROFILE" \
 		$LOAD_FIRST \
+		${UA_ARG:+"$UA_ARG"} \
 		"$1" &
 	exit 0
 }
@@ -150,7 +164,7 @@ sign_in_in_browser()
 	# "R Chromium" is the binary itself; "R Chromium" elsewhere.
 	for launcher in "$APPDIR/rchromium.sh" "$APPDIR/R Chromium"; do
 		if [ -x "$launcher" ]; then
-			exec "$launcher" "$SIGNIN_URL"
+			exec "$launcher" ${UA_ARG:+"$UA_ARG"} "$SIGNIN_URL"
 		fi
 	done
 	open "$SIGNIN_URL"

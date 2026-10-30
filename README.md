@@ -10,12 +10,14 @@ R Slack.
 ## Install with pkgman
 
 ```sh
-pkgman add-repo https://pkgman.rainygirl.com/x86_64    # or arm64
+pkgman add-repo https://pkgman.rainygirl.com/x86_64    # or arm64, x86_gcc2
 pkgman install rslack                                   # also installs R Chromium
 ```
 
-Not on 32-bit x86 (x86_gcc2) yet. R Chromium there is Chromium 114, which
-Slack no longer supports: it answers "Please update your browser".
+On 32-bit x86 (x86_gcc2) R Chromium is Chromium 114, which Slack no longer
+supports. The windows R Slack opens, the app and the sign-in browser, say a
+newer Chrome in their user agent; this needs rchromium_x86 114.0.5735.199-16
+or later.
 
 ## Signing in
 

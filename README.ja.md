@@ -10,13 +10,14 @@ Web ブラウザー (ツールバーのある R Chromium のウィンドウ) で
 ## pkgman でインストール
 
 ```sh
-pkgman add-repo https://pkgman.rainygirl.com/x86_64    # または arm64
+pkgman add-repo https://pkgman.rainygirl.com/x86_64    # または arm64, x86_gcc2
 pkgman install rslack                                   # R Chromium も一緒に入ります
 ```
 
-32 ビット x86 (x86_gcc2) 版はまだありません。そこの R Chromium は Chromium 114
-で、Slack はこの版をもうサポートしておらず「Please update your browser」と表示
-します。
+32 ビット x86 (x86_gcc2) の R Chromium は Chromium 114 で、Slack はこの版をもう
+サポートしていません。R Slack が開くウィンドウ (アプリとサインイン用ブラウザー)
+は user agent で新しい Chrome を名乗ります。rchromium_x86 114.0.5735.199-16 以降
+が必要です。
 
 ## サインイン
 
