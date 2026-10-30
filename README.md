@@ -1,0 +1,79 @@
+# R Slack
+
+[English](README.md) | [한국어](README.ko.md) | [日本語](README.ja.md)
+
+Slack in its own window on RenkuOS (Haiku), using R Chromium without the
+browser toolbar. It signs in the way Slack's desktop app does: in your web
+browser, which then hands the session to R Slack.
+
+## Install with pkgman
+
+```sh
+pkgman add-repo https://pkgman.rainygirl.com/x86_64    # or arm64, x86_gcc2
+pkgman install rslack                                   # also installs R Chromium
+```
+
+On 32-bit x86 (x86_gcc2) the browser package is `rchromium_x86`; pkgman picks
+it.
+
+## Signing in
+
+1. Start **R Slack** from Deskbar -> Applications.
+2. The first time, it asks where to sign in. Choose **Open the browser**: your
+   web browser opens `slack.com/ssb/signin`.
+3. Sign in there -- email, Google, SSO, whichever your workspace uses.
+4. At the end the browser opens a `slack://` link, and R Slack opens with
+   your workspace.
+
+To add another workspace, run `"/boot/system/apps/RSlack/R Slack" --sign-in`
+and sign in again.
+
+**Sign in here** instead signs in inside the R Slack window. Use it when the
+browser does not hand `slack://` links on.
+
+The browser has to pass `slack://` links to Haiku:
+
+- WebPositive does this when a page goes to a scheme it does not know.
+- R Chromium does it from the builds that come with this app (154.0.8036.0-15
+  and 114.0.5735.199-15).
+
+## How it works
+
+`R Slack` is a shell script, like R Twitter. It starts R Chromium's
+`content_shell` at `https://app.slack.com/client` with:
+
+- the toolbar off;
+- the window named R Slack;
+- a profile of its own in `~/config/settings/RSlack`.
+
+Every time it starts it registers itself, with `setmime`, as the preferred
+application of `application/x-vnd.Be.URL.slack`. That is the type Haiku looks
+up for a `slack://` link.
+
+The browser sign-in ends with
+`slack://<TEAM>/magic-login/<token>[?host=...]`. R Slack turns that into
+`https://app.slack.com/api/auth.loginMagicBulk?magic_tokens=z-app-<TEAM>-<token>&ssb=1`
+and loads it in a window of its own, so that Slack sets the session cookies in
+R Slack's profile. Then it opens the client.
+
+The conversion is the one
+[Zlack](https://github.com/sanguneo/zlack/pull/14) worked out for its own
+client. `slack://channel?team=...&id=...` links open that conversation.
+
+What the browser says about itself goes to
+`~/config/settings/RSlack/rslack.log`. The run before is kept as `.log.1`.
+
+## Build from source
+
+On Haiku:
+
+```sh
+make install     # ~/config/non-packaged/apps/RSlack, and a Deskbar entry
+```
+
+`python3 tools/make_icon.py` redraws the icon.
+
+## License
+
+MIT. Slack and its logo are trademarks of Slack Technologies, LLC; R Slack is
+not made or endorsed by Slack. See `assets/NOTICE`.
