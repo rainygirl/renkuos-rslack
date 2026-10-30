@@ -17,7 +17,8 @@ pkgman install rslack                                   # R Chromium も一緒�
 32 ビット x86 (x86_gcc2) の R Chromium は Chromium 114 で、Slack はこの版をもう
 サポートしていません。R Slack が開くウィンドウ (アプリとサインイン用ブラウザー)
 は user agent で新しい Chrome を名乗ります。rchromium_x86 114.0.5735.199-16 以降
-が必要です。
+が必要です。そこでは Slack の表示まで 1、2 分かかります (VAIO P など)。準備が
+できるまでウィンドウには灰色の枠だけが出ます。R Slack は開くときにそう知らせます。
 
 ## サインイン
 

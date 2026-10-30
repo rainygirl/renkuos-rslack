@@ -17,7 +17,9 @@ pkgman install rslack                                   # also installs R Chromi
 On 32-bit x86 (x86_gcc2) R Chromium is Chromium 114, which Slack no longer
 supports. The windows R Slack opens, the app and the sign-in browser, say a
 newer Chrome in their user agent; this needs rchromium_x86 114.0.5735.199-16
-or later.
+or later. Slack takes a minute or two to load there (on a VAIO P, for
+one); the window shows a grey outline until it is ready, and R Slack says so
+when it opens.
 
 ## Signing in
 

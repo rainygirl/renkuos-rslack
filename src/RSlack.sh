@@ -132,6 +132,17 @@ open_window()
 	# before the script runs. content_shell's own BApplication in that team
 	# never finished registering, and its looper spun at 100% of a core while
 	# the window stayed white. A child team of its own has no such past.
+	# On 32-bit x86 (Chromium 114, and machines like the VAIO P) Slack takes
+	# a minute or two to start, over a grey outline of the window; say so,
+	# or it looks stuck.
+	case "$(uname -m)" in
+		BePC|i*86)
+			notify --group "R Slack" --title "R Slack" --timeout 20 \
+				"Slack takes a minute or two to load on this computer. The grey outline fills in when it is ready." \
+				> /dev/null 2>&1 &
+			;;
+	esac
+
 	# From R Chromium's own folder, as its launcher does; started by the
 	# roster the working directory is elsewhere.
 	cd "$APPDIR" || exit 1
