@@ -146,9 +146,13 @@ open_window()
 # to Haiku, which starts this script with it.
 sign_in_in_browser()
 {
-	if [ -x "$APPDIR/R Chromium" ]; then
-		exec "$APPDIR/R Chromium" "$SIGNIN_URL"
-	fi
+	# The browser's launcher: rchromium.sh in the x86 package, where
+	# "R Chromium" is the binary itself; "R Chromium" elsewhere.
+	for launcher in "$APPDIR/rchromium.sh" "$APPDIR/R Chromium"; do
+		if [ -x "$launcher" ]; then
+			exec "$launcher" "$SIGNIN_URL"
+		fi
+	done
 	open "$SIGNIN_URL"
 }
 
