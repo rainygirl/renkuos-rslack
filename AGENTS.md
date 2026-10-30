@@ -23,18 +23,34 @@ with `<host>` = `app.slack.com` unless the link names a `*.slack.com` host.
 That response sets the session cookies. Team IDs are upper case; some openers
 lower-case the authority part of the URL, so the script upper-cases it back.
 
-### Why a second window (`src/login.html`)
+### Loading the sign-in call out of sight (`--rch-load-first`)
 
-The cookies are SameSite and count only from a top-level navigation. An iframe
-or a fetch() from the local page does not set them. A script cannot drive
-content_shell from outside. So `login.html` opens the API URL with
-`window.open` and, after 8 s, closes that window and goes to the client. The
-answer cannot be read across origins, so a refused token shows up as Slack's
-sign-in page in the client.
+Slack's session cookie `d` is SameSite=Lax (checked in the profile's cookie
+database, 2026-10-30). It counts only from a top-level navigation: an iframe or
+a fetch() from a local page does not keep it.
+
+The first version loaded the call in a `window.open` popup from a local
+`login.html`. That showed the user Slack's JSON answer for 8 s. R Chromium now
+takes `--rch-load-first=<https URL>`
+(`port-shell-load-first.py`). It loads that URL in a WebContents with no
+window, in the same profile, and opens the startup window when the load stops
+(or after 30 s). The script passes the API URL there and starts the client.
 
 The script validates the team, the token and the host against the characters
-each may hold before building the URL. `login.html` accepts only that exact
-URL shape after the `#`.
+each may hold before building the URL. A refused token shows up as Slack's
+sign-in page in the client.
+
+### content_shell is a child, not exec'd
+
+When Haiku starts R Slack (Deskbar, Tracker, a slack:// link), the roster has
+pre-registered the script's team under R Slack's signature. content_shell
+exec'd into that team never finished its own BApplication registration. Its
+`HaikuApp` looper spun at a full core and the window stayed white
+(2026-10-30, found with `top` in the arm64 guest). Started as a child team, it
+does not, and the script exits.
+
+The Slack client takes about a minute to its first paint in the arm64 guest.
+The window is white until then; that is the client booting, not a hang.
 
 ### Handler registration
 

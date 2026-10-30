@@ -53,8 +53,8 @@ Haiku에 넘깁니다. WebPositive도 모르는 스킴으로 가는 페이지를
 브라우저 로그인은 `slack://<TEAM>/magic-login/<token>[?host=...]`으로 끝납니다.
 R Slack은 이것을
 `https://app.slack.com/api/auth.loginMagicBulk?magic_tokens=z-app-<TEAM>-<token>&ssb=1`로
-바꿔 별도 창에서 엽니다. 그러면 Slack이 R Slack 프로필에 세션 쿠키를 저장하고,
-그다음 클라이언트가 열립니다.
+바꿔 R Chromium이 창 없이 먼저 불러오게 합니다(`--rch-load-first`). 그러면 Slack이
+R Slack 프로필에 세션 쿠키를 저장하고, 그다음 클라이언트가 열립니다.
 
 이 변환은 [Zlack](https://github.com/sanguneo/zlack/pull/14)이 자기 클라이언트를
 위해 알아낸 방식입니다. `slack://channel?team=...&id=...` 링크는 그 대화를 엽니다.

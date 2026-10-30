@@ -11,8 +11,8 @@
 # application of application/x-vnd.Be.URL.slack every time it starts), so
 # Haiku starts this script with that link as $1. The token becomes
 # z-app-<TEAM>-<token> and goes to auth.loginMagicBulk, which sets the
-# session cookies in R Slack's own profile; then the window goes to
-# app.slack.com/client. The same conversion is described in
+# session cookies in R Slack's own profile. R Chromium loads that out of
+# sight (--rch-load-first) and then opens app.slack.com/client. The same conversion is described in
 # https://github.com/sanguneo/zlack/pull/14, which does this for a Tauri app.
 #
 #   R Slack                 the client, or the sign-in prompt the first time
@@ -27,9 +27,8 @@ SIGNIN_URL="https://slack.com/ssb/signin"
 # content_shell opens 800x600 otherwise; this fits a 1600x768 VAIO P screen.
 WINDOW_SIZE="--content-shell-host-window-size=1100x700"
 
-# Deskbar starts us through a symlink; login.html sits beside the real file.
+# Deskbar starts us through a symlink; the MIME database wants the real file.
 SELF=$(readlink -f "$0" 2>/dev/null || echo "$0")
-HERE=$(dirname "$SELF")
 
 # Where R Chromium may be: the package, then a hand-installed copy.
 #
@@ -114,7 +113,16 @@ open_window()
 	#
 	# Both profile switches: 114's content_shell reads --data-path, 154's
 	# --user-data-dir; each ignores the other.
-	exec "$APPDIR/content_shell" \
+	#
+	# Not exec: when Haiku starts R Slack (Deskbar, Tracker, or a slack://
+	# link), the roster has registered this team under R Slack's signature
+	# before the script runs. content_shell's own BApplication in that team
+	# never finished registering, and its looper spun at 100% of a core while
+	# the window stayed white. A child team of its own has no such past.
+	# From R Chromium's own folder, as its launcher does; started by the
+	# roster the working directory is elsewhere.
+	cd "$APPDIR" || exit 1
+	"$APPDIR/content_shell" \
 		--ozone-platform=haiku \
 		--disable-gpu \
 		--in-process-gpu \
@@ -124,7 +132,9 @@ open_window()
 		"$WINDOW_SIZE" \
 		--data-path="$PROFILE" \
 		--user-data-dir="$PROFILE" \
-		"$1"
+		$LOAD_FIRST \
+		"$1" &
+	exit 0
 }
 
 # Sign-in in the web browser, the way Slack's desktop app does it: R Chromium
@@ -188,8 +198,11 @@ Only workspaces on slack.com are supported." "OK" > /dev/null
 	esac
 
 	touch "$PROFILE/.signed-in"
-	api="https://$host/api/auth.loginMagicBulk?magic_tokens=z-app-$team-$token&ssb=1"
-	open_window "file://$HERE/login.html#$api"
+	# The session cookie Slack sets is SameSite=Lax: it counts only from a
+	# top-level load, not from an iframe or a fetch(). R Chromium loads the
+	# call in a tab that has no window, then opens the client.
+	LOAD_FIRST="--rch-load-first=https://$host/api/auth.loginMagicBulk?magic_tokens=z-app-$team-$token&ssb=1"
+	open_window "$CLIENT_URL"
 }
 
 bad_link()

@@ -53,8 +53,8 @@ up for a `slack://` link.
 The browser sign-in ends with
 `slack://<TEAM>/magic-login/<token>[?host=...]`. R Slack turns that into
 `https://app.slack.com/api/auth.loginMagicBulk?magic_tokens=z-app-<TEAM>-<token>&ssb=1`
-and loads it in a window of its own, so that Slack sets the session cookies in
-R Slack's profile. Then it opens the client.
+and has R Chromium load it out of sight (`--rch-load-first`), so that Slack
+sets the session cookies in R Slack's profile. Then it opens the client.
 
 The conversion is the one
 [Zlack](https://github.com/sanguneo/zlack/pull/14) worked out for its own

@@ -54,8 +54,9 @@ RENKU arm64 の既定のブラウザーは WebPositive ですが、そこには 
 ブラウザーでのサインインは `slack://<TEAM>/magic-login/<token>[?host=...]` で
 終わります。R Slack はこれを
 `https://app.slack.com/api/auth.loginMagicBulk?magic_tokens=z-app-<TEAM>-<token>&ssb=1`
-に変え、別のウィンドウで開きます。すると Slack が R Slack のプロファイルに
-セッションの Cookie を保存し、そのあとクライアントが開きます。
+に変え、R Chromium にウィンドウなしで先に読み込ませます (`--rch-load-first`)。
+すると Slack が R Slack のプロファイルにセッションの Cookie を保存し、
+そのあとクライアントが開きます。
 
 この変換は [Zlack](https://github.com/sanguneo/zlack/pull/14) が自分の
 クライアントのために見つけた方法です。`slack://channel?team=...&id=...` リンクは
