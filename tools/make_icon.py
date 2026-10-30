@@ -1,11 +1,19 @@
 # -*- coding: utf-8 -*-
-"""Generate the R Slack HVIF icon: Slack's four-colour mark printed on the
-low isometric box the R applications share (see R Twitter's make_icon.py).
+"""Generate the R Slack HVIF icon: Slack's mark as a solid object, turned the
+way BeOS and Haiku draw things.
+
+The mark is its eight pieces -- four pills and four nubs in blue, green,
+yellow and red -- laid on the isometric plane the other R applications use
+(R Twitter's box lid, R Departures' board), each given a thickness, so the
+flanks show: the face is the colour, the flank facing down-left a shade
+darker, the one facing down-right darker still. Pieces are drawn back to
+front.
 
 Writes RSlack.rdef's vector_icon resource and assets/RSlack.hvif.
 """
 
 import io
+import math
 import os
 import re
 
@@ -23,80 +31,102 @@ def coord(value):
 def polygon(points):
     data = bytearray([0x0A, len(points)])
     for x, y in points:
-        data += coord(x) + coord(y)
+        data += coord(round(x, 2)) + coord(round(y, 2))
     return data
 
 
-def on_lid(gx, gy):
-    """A point of a 4x4 grid inset on the box's lid, projected like the box."""
-    u = 0.12 + (gx / 4.0) * 0.76
-    v = 0.12 + (gy / 4.0) * 0.76
-    return (32.0 + 26.0 * u - 26.0 * v, 9.0 + 13.0 * u + 13.0 * v)
+# The mark on a 5x5 grid, pieces one unit thick: (colour, x0, y0, x1, y1).
+# Each colour is a pill and the nub beside its end, pinwheeling round the
+# centre: blue upper left, green upper right, yellow lower right, red lower
+# left.
+PIECES = [
+    (0, 1.2, 0.0, 2.2, 2.6), (0, 0.0, 1.6, 1.0, 2.6),
+    (1, 2.4, 1.2, 5.0, 2.2), (1, 2.4, 0.0, 3.4, 1.0),
+    (2, 2.8, 2.4, 3.8, 5.0), (2, 4.0, 2.4, 5.0, 3.4),
+    (3, 0.0, 2.8, 2.6, 3.8), (3, 1.6, 4.0, 2.6, 5.0),
+]
+COLOURS = [
+    (54, 197, 240),   # blue
+    (46, 182, 125),   # green
+    (236, 178, 46),   # yellow
+    (224, 30, 90),    # red
+]
+THICKNESS = 5.0       # pixels the pieces stand off the plane
 
 
-# Each colour is drawn a little inside its cells, so that the colours stay
-# apart at 16 px as they do in the mark.
-GAP = 0.12
+def shade(colour, factor):
+    return tuple(int(round(c * factor)) for c in colour) + (255,)
 
 
-def lid(points):
-    return [on_lid(x, y) for x, y in points]
+def rounded_rect(x0, y0, x1, y1, radius, steps=4):
+    """Corners rounded with `radius`; a pill when radius is half the width."""
+    radius = min(radius, (x1 - x0) / 2.0, (y1 - y0) / 2.0)
+    corners = [
+        (x1 - radius, y0 + radius, -90.0),
+        (x1 - radius, y1 - radius, 0.0),
+        (x0 + radius, y1 - radius, 90.0),
+        (x0 + radius, y0 + radius, 180.0),
+    ]
+    points = []
+    for cx, cy, start in corners:
+        for s in range(steps + 1):
+            a = math.radians(start + 90.0 * s / steps)
+            points.append((cx + radius * math.cos(a), cy + radius * math.sin(a)))
+    return points
+
+
+def project(gx, gy):
+    """The grid on the isometric plane: +x runs down to the right, +y down
+    to the left, as on the lids of the other R icons."""
+    u = gx / 5.0
+    v = gy / 5.0
+    return (32.0 + 30.0 * u - 30.0 * v, 16.0 + 15.0 * u + 15.0 * v)
 
 
 def build_icon():
-    styles = [
-        (244, 240, 244, 255),  # lid
-        (110, 52, 112, 255),   # left side, Slack aubergine
-        (74, 21, 75, 255),     # right side
-        (45, 12, 46, 255),     # lower rim shadow
-        (54, 197, 240, 255),   # blue
-        (46, 182, 125, 255),   # green
-        (236, 178, 46, 255),   # yellow
-        (224, 30, 90, 255),    # red
-    ]
+    styles = []
     shapes = []
 
-    def add(style, points):
-        shapes.append((style, points))
+    def style(rgba):
+        if rgba not in styles:
+            styles.append(rgba)
+        return styles.index(rgba)
 
-    far = (32, 9)
-    right = (58, 22)
-    near = (32, 35)
-    left = (6, 22)
-    depth = 7
+    def add(rgba, points):
+        shapes.append((style(rgba), points))
 
-    add(3, [(7, 24), (32, 37), (57, 24),
-            (57, 31), (32, 44), (7, 31)])
-    add(1, [left, near, (32, near[1] + depth),
-            (left[0], left[1] + depth)])
-    add(2, [right, near, (32, near[1] + depth),
-            (right[0], right[1] + depth)])
-    add(0, [far, right, near, left])
-
-    # The mark is a pinwheel of four L shapes, a bar and the nub beside its
-    # end, on a 4x4 grid: blue upper left, green upper right, yellow lower
-    # right, red lower left.
-    g = GAP
-    add(4, lid([(1 + g, g), (2 - g, g), (2 - g, 2 - g), (g, 2 - g),
-                (g, 1 + g), (1 + g, 1 + g)]))
-    add(5, lid([(2 + g, g), (3 - g, g), (3 - g, 1 + g), (4 - g, 1 + g),
-                (4 - g, 2 - g), (2 + g, 2 - g)]))
-    add(6, lid([(2 + g, 2 + g), (4 - g, 2 + g), (4 - g, 3 - g),
-                (3 - g, 3 - g), (3 - g, 4 - g), (2 + g, 4 - g)]))
-    add(7, lid([(g, 2 + g), (2 - g, 2 + g), (2 - g, 4 - g), (1 + g, 4 - g),
-                (1 + g, 3 - g), (g, 3 - g)]))
+    order = sorted(PIECES, key=lambda p: (p[1] + p[3]) + (p[2] + p[4]))
+    for colour, x0, y0, x1, y1 in order:
+        # Pills have fully round ends; nubs are squarer.
+        is_pill = max(x1 - x0, y1 - y0) > 1.5
+        outline = rounded_rect(x0, y0, x1, y1, 0.5 if is_pill else 0.32)
+        top = [project(x, y) for x, y in outline]
+        # Orientation, for which way each edge faces.
+        area = sum(a[0] * b[1] - b[0] * a[1]
+                   for a, b in zip(top, top[1:] + top[:1]))
+        base = COLOURS[colour]
+        for a, b in zip(top, top[1:] + top[:1]):
+            dx, dy = b[0] - a[0], b[1] - a[1]
+            # Outward normal on screen; only edges facing down show a flank.
+            nx, ny = (dy, -dx) if area > 0 else (-dy, dx)
+            if ny <= 0:
+                continue
+            factor = 0.72 if nx < 0 else 0.55
+            add(shade(base, factor), [a, b, (b[0], b[1] + THICKNESS),
+                                      (a[0], a[1] + THICKNESS)])
+        add(shade(base, 1.0), top)
 
     output = bytearray(b"ncif")
     output.append(len(styles))
-    for color in styles:
+    for colour in styles:
         output.append(1)
-        output += bytes(color)
+        output += bytes(colour)
     output.append(len(shapes))
     for _, points in shapes:
         output += polygon(points)
     output.append(len(shapes))
-    for index, (style, _) in enumerate(shapes):
-        output += bytes([0x0A, style, 1, index, 0])
+    for index, (style_index, _) in enumerate(shapes):
+        output += bytes([0x0A, style_index, 1, index, 0])
     return bytes(output)
 
 
@@ -112,8 +142,8 @@ def resource(data):
 
 
 if __name__ == "__main__":
-    project = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
-    path = os.path.join(project, "RSlack.rdef")
+    project_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
+    path = os.path.join(project_dir, "RSlack.rdef")
     text = io.open(path, encoding="utf-8").read()
     block = re.compile(r"^resource vector_icon \{.*?^\};\n?", re.S | re.M)
     if len(block.findall(text)) != 1:
@@ -122,6 +152,6 @@ if __name__ == "__main__":
     io.open(path, "w", encoding="utf-8").write(
         block.sub(lambda _: resource(data), text, count=1))
     # The same bytes as a file, for the BEOS:ICON attribute.
-    with open(os.path.join(project, "assets", "RSlack.hvif"), "wb") as f:
+    with open(os.path.join(project_dir, "assets", "RSlack.hvif"), "wb") as f:
         f.write(data)
     print("RSlack.rdef, assets/RSlack.hvif: wrote %d-byte HVIF" % len(data))
