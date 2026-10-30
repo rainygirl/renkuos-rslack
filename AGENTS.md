@@ -107,3 +107,14 @@ client hints do not matter. Chrome/140 got a banner that support ends on
 it (rchromium_x86 114.0.5735.199-16). RSlack.sh passes UA_ARG to both the app
 window and the sign-in browser on BePC/i*86. Checked on the VAIO: the sign-in
 page and the app window's sign-in page load without the refusal.
+
+## reCAPTCHA on the VAIO, 2026-10-31
+
+Slack's email sign-in has a reCAPTCHA checkbox that spun for ever on the VAIO
+P. Not the user agent (Chrome/114 fails the same): reCAPTCHA's worker takes
+about 20 s for its first answer on the Atom and the frames give each other
+10-15 s ("reCAPTCHA Timeout"). rchromium_x86 114.0.5735.199-17
+(port-recaptcha-time.py) makes those timers six times as long; the image
+challenge then appears. An extension content script would have been the
+place for it, but any content script crashes the 114 renderer (SIGSEGV),
+which is still open.
