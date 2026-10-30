@@ -116,6 +116,16 @@ def build_icon():
                                       (a[0], a[1] + THICKNESS)])
         add(shade(base, 1.0), top)
 
+    # Fill the icon the way the other R icons do: scale the drawing to a
+    # 2-pixel margin across, and centre it. Thickness scales with it.
+    xs = [x for _, points in shapes for x, _ in points]
+    ys = [y for _, points in shapes for _, y in points]
+    scale = min(60.0 / (max(xs) - min(xs)), 60.0 / (max(ys) - min(ys)))
+    dx = 32.0 - scale * (max(xs) + min(xs)) / 2.0
+    dy = 32.0 - scale * (max(ys) + min(ys)) / 2.0
+    shapes[:] = [(s, [(x * scale + dx, y * scale + dy) for x, y in points])
+                 for s, points in shapes]
+
     output = bytearray(b"ncif")
     output.append(len(styles))
     for colour in styles:
