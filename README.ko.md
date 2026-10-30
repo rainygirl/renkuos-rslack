@@ -10,12 +10,12 @@ R Chromium을 씁니다. 로그인은 Slack 데스크톱 앱과 같은 방식입
 ## pkgman으로 설치
 
 ```sh
-pkgman add-repo https://pkgman.rainygirl.com/x86_64    # 또는 arm64, x86_gcc2
+pkgman add-repo https://pkgman.rainygirl.com/x86_64    # 또는 arm64
 pkgman install rslack                                   # R Chromium도 함께 설치
 ```
 
-32비트 x86(x86_gcc2)에서는 브라우저 패키지가 `rchromium_x86`이고, pkgman이
-알아서 고릅니다.
+32비트 x86(x86_gcc2)용은 아직 없습니다. 그곳의 R Chromium은 Chromium 114인데,
+Slack이 이 버전을 더 이상 지원하지 않아 "Please update your browser"를 띄웁니다.
 
 ## 로그인
 
@@ -34,8 +34,7 @@ pkgman install rslack                                   # R Chromium도 함께 �
 
 로그인에는 Haiku의 기본 웹 브라우저 대신 R Chromium을 씁니다. RENKU arm64의 기본
 브라우저는 WebPositive인데, 그곳에는 WebKit이 없어 실행되지 않습니다. R Chromium은
-이 앱과 함께 나온 빌드(154.0.8036.0-15, 114.0.5735.199-15)부터 `slack://` 링크를
-Haiku에 넘깁니다. WebPositive도 모르는 스킴으로 가는 페이지를 Haiku에 넘깁니다.
+154.0.8036.0-15부터 `slack://` 링크를 Haiku에 넘깁니다. WebPositive도 모르는 스킴으로 가는 페이지를 Haiku에 넘깁니다.
 
 ## 동작 방식
 

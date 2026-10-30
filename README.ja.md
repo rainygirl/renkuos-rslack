@@ -10,12 +10,13 @@ Web ブラウザー (ツールバーのある R Chromium のウィンドウ) で
 ## pkgman でインストール
 
 ```sh
-pkgman add-repo https://pkgman.rainygirl.com/x86_64    # または arm64、x86_gcc2
+pkgman add-repo https://pkgman.rainygirl.com/x86_64    # または arm64
 pkgman install rslack                                   # R Chromium も一緒に入ります
 ```
 
-32 ビット x86 (x86_gcc2) ではブラウザーのパッケージは `rchromium_x86` で、pkgman
-が選びます。
+32 ビット x86 (x86_gcc2) 版はまだありません。そこの R Chromium は Chromium 114
+で、Slack はこの版をもうサポートしておらず「Please update your browser」と表示
+します。
 
 ## サインイン
 
@@ -34,8 +35,7 @@ pkgman install rslack                                   # R Chromium も一緒�
 
 サインインには Haiku の既定の Web ブラウザーではなく R Chromium を使います。
 RENKU arm64 の既定のブラウザーは WebPositive ですが、そこには WebKit がなく起動
-しません。R Chromium は、このアプリと一緒に出たビルド (154.0.8036.0-15、
-114.0.5735.199-15) から `slack://` リンクを Haiku に渡します。WebPositive も、
+しません。R Chromium は 154.0.8036.0-15 から `slack://` リンクを Haiku に渡します。WebPositive も、
 知らないスキームへ進むページを Haiku に渡します。
 
 ## しくみ

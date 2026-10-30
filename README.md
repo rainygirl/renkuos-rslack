@@ -10,12 +10,12 @@ R Slack.
 ## Install with pkgman
 
 ```sh
-pkgman add-repo https://pkgman.rainygirl.com/x86_64    # or arm64, x86_gcc2
+pkgman add-repo https://pkgman.rainygirl.com/x86_64    # or arm64
 pkgman install rslack                                   # also installs R Chromium
 ```
 
-On 32-bit x86 (x86_gcc2) the browser package is `rchromium_x86`; pkgman picks
-it.
+Not on 32-bit x86 (x86_gcc2) yet. R Chromium there is Chromium 114, which
+Slack no longer supports: it answers "Please update your browser".
 
 ## Signing in
 
@@ -33,9 +33,8 @@ and sign in again.
 
 The sign-in uses R Chromium rather than Haiku's preferred web browser. On
 RENKU arm64 that is WebPositive, which has no WebKit there and does not start.
-R Chromium passes the `slack://` link to Haiku from the builds that come with
-this app (154.0.8036.0-15 and 114.0.5735.199-15). WebPositive does the same
-when a page goes to a scheme it does not know.
+R Chromium passes the `slack://` link to Haiku from 154.0.8036.0-15 on.
+WebPositive does the same when a page goes to a scheme it does not know.
 
 ## How it works
 

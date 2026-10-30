@@ -95,3 +95,13 @@ WebPositive. It has no WebKit there and exits at once (2026-10-30).
 
 `RSLACK_RCHROMIUM=<dir>` makes the script use another R Chromium copy, which
 is how the patched build was tried before packaging.
+
+## Not on x86 (Chromium 114), 2026-10-30
+
+The R Slack flow works on the VAIO (the slack:// hand-off, --rch-load-first,
+the client starting), but Slack's server answers "Please update your browser"
+to Chrome 114. Probed with curl: Chrome/135 in the user agent is refused and
+Chrome/138 is accepted. The client hints do not matter. The 114 content_shell
+also ignores --user-agent (it always sends Chrome/114.0.5735.199), so an
+override would need a port patch. Whether Slack's web app then runs on the
+114 engine is untested. The pkgman recipe ships arm64 and x86_64 only.
