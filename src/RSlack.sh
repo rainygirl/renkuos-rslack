@@ -32,7 +32,10 @@ SELF=$(readlink -f "$0" 2>/dev/null || echo "$0")
 HERE=$(dirname "$SELF")
 
 # Where R Chromium may be: the package, then a hand-installed copy.
+#
+# RSLACK_RCHROMIUM names another copy, which is how to try a new build.
 for dir in \
+	${RSLACK_RCHROMIUM:+"$RSLACK_RCHROMIUM"} \
 	"/boot/system/apps/RChromium" \
 	"$HOME/config/non-packaged/apps/RChromium" \
 	"$HOME/RChromium"
@@ -83,6 +86,12 @@ open_window()
 		export FONTCONFIG_FILE
 	fi
 
+	# R Chromium's own libraries (the Haiku shim among them) are in its lib/.
+	# A session started over ssh has LIBRARY_PATH unset, which would also
+	# hide /boot/system/lib, so the defaults are spelled out.
+	LIBRARY_PATH="$APPDIR/lib:${LIBRARY_PATH:-/boot/home/config/non-packaged/lib:/boot/home/config/lib:/boot/system/non-packaged/lib:/boot/system/lib}"
+	export LIBRARY_PATH
+
 	# No toolbar, and the window carries this app's name.
 	RCH_NO_TOOLBAR=1
 	RCH_APP_NAME="$APP_TITLE"
@@ -118,10 +127,18 @@ open_window()
 		"$1"
 }
 
-# Sign-in in the web browser, the way Slack's desktop app does it. Haiku's
-# open hands an https URL to the preferred web browser.
+# Sign-in in the web browser, the way Slack's desktop app does it: R Chromium
+# as a browser, toolbar and all, in its own profile.
+#
+# Not Haiku's preferred browser through `open`: on RENKU arm64 that is
+# WebPositive, which has no WebKit there and exits at once. R Chromium is
+# installed wherever R Slack is, and it hands the slack:// link at the end
+# to Haiku, which starts this script with it.
 sign_in_in_browser()
 {
+	if [ -x "$APPDIR/R Chromium" ]; then
+		exec "$APPDIR/R Chromium" "$SIGNIN_URL"
+	fi
 	open "$SIGNIN_URL"
 }
 

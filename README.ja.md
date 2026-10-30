@@ -4,7 +4,8 @@
 
 RenkuOS (Haiku) で Slack をブラウザーのツールバーのない専用ウィンドウで開きます。
 R Chromium を使います。サインインは Slack のデスクトップアプリと同じ方式です。
-Web ブラウザーでサインインすると、ブラウザーがセッションを R Slack に渡します。
+Web ブラウザー (ツールバーのある R Chromium のウィンドウ) でサインインすると、
+ブラウザーがセッションを R Slack に渡します。
 
 ## pkgman でインストール
 
@@ -19,8 +20,8 @@ pkgman install rslack                                   # R Chromium も一緒�
 ## サインイン
 
 1. Deskbar -> アプリケーションから **R Slack** を起動します。
-2. 初回はどこでサインインするかを尋ねます。**Open the browser** を選ぶと、Web
-   ブラウザーで `slack.com/ssb/signin` が開きます。
+2. 初回はどこでサインインするかを尋ねます。**Open the browser** を選ぶと、
+   R Chromium のブラウザーウィンドウで `slack.com/ssb/signin` が開きます。
 3. そこでサインインします。メール、Google、SSO など、ワークスペースで使っている
    方法でかまいません。
 4. 最後にブラウザーが `slack://` リンクを開き、R Slack がワークスペースと一緒に
@@ -29,14 +30,13 @@ pkgman install rslack                                   # R Chromium も一緒�
 ワークスペースを追加するには `"/boot/system/apps/RSlack/R Slack" --sign-in` を
 実行して、もう一度サインインします。
 
-**Sign in here** を選ぶと R Slack のウィンドウの中でサインインします。ブラウザー
-が `slack://` リンクを渡せないときに使ってください。
+**Sign in here** を選ぶと R Slack のウィンドウの中でサインインします。
 
-ブラウザーが `slack://` リンクを Haiku に渡す必要があります。
-
-- WebPositive は、知らないスキームへ進むページを Haiku に渡します。
-- R Chromium は、このアプリと一緒に出たビルド (154.0.8036.0-15、
-  114.0.5735.199-15) から渡します。
+サインインには Haiku の既定の Web ブラウザーではなく R Chromium を使います。
+RENKU arm64 の既定のブラウザーは WebPositive ですが、そこには WebKit がなく起動
+しません。R Chromium は、このアプリと一緒に出たビルド (154.0.8036.0-15、
+114.0.5735.199-15) から `slack://` リンクを Haiku に渡します。WebPositive も、
+知らないスキームへ進むページを Haiku に渡します。
 
 ## しくみ
 

@@ -3,8 +3,9 @@
 [English](README.md) | [한국어](README.ko.md) | [日本語](README.ja.md)
 
 Slack in its own window on RenkuOS (Haiku), using R Chromium without the
-browser toolbar. It signs in the way Slack's desktop app does: in your web
-browser, which then hands the session to R Slack.
+browser toolbar. It signs in the way Slack's desktop app does: in the web
+browser (R Chromium, toolbar and all), which then hands the session to
+R Slack.
 
 ## Install with pkgman
 
@@ -19,8 +20,8 @@ it.
 ## Signing in
 
 1. Start **R Slack** from Deskbar -> Applications.
-2. The first time, it asks where to sign in. Choose **Open the browser**: your
-   web browser opens `slack.com/ssb/signin`.
+2. The first time, it asks where to sign in. Choose **Open the browser**: an
+   R Chromium browser window opens `slack.com/ssb/signin`.
 3. Sign in there -- email, Google, SSO, whichever your workspace uses.
 4. At the end the browser opens a `slack://` link, and R Slack opens with
    your workspace.
@@ -28,14 +29,13 @@ it.
 To add another workspace, run `"/boot/system/apps/RSlack/R Slack" --sign-in`
 and sign in again.
 
-**Sign in here** instead signs in inside the R Slack window. Use it when the
-browser does not hand `slack://` links on.
+**Sign in here** instead signs in inside the R Slack window.
 
-The browser has to pass `slack://` links to Haiku:
-
-- WebPositive does this when a page goes to a scheme it does not know.
-- R Chromium does it from the builds that come with this app (154.0.8036.0-15
-  and 114.0.5735.199-15).
+The sign-in uses R Chromium rather than Haiku's preferred web browser. On
+RENKU arm64 that is WebPositive, which has no WebKit there and does not start.
+R Chromium passes the `slack://` link to Haiku from the builds that come with
+this app (154.0.8036.0-15 and 114.0.5735.199-15). WebPositive does the same
+when a page goes to a scheme it does not know.
 
 ## How it works
 

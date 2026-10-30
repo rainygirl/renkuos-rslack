@@ -58,9 +58,24 @@ script carries `BEOS:APP_SIG`, so the roster also finds it by query.
   run `/bin/open <url>` for the main frame or a click. That is in R Chromium
   154.0.8036.0-15 and 114.0.5735.199-15.
 
-## Status
+### The sign-in browser is R Chromium
 
-Written 2026-10-30 while every Haiku test machine was offline: the parts that
-need a machine are untested. Those are the handler launch from a browser,
-`window.open` from a `file://` page in content_shell, and Slack's answer to
-the token.
+`--sign-in` and "Open the browser" start `$APPDIR/R Chromium` (the browser
+launcher, with toolbar and its own default profile) at slack.com/ssb/signin.
+They do not use `open`, because Haiku's preferred browser on RENKU arm64 is
+WebPositive. It has no WebKit there and exits at once (2026-10-30).
+
+## Tested (2026-10-30, RENKU arm64 in QEMU on the Mac, R Chromium 154 with the patch)
+
+- `--sign-in` registers the handler (`META:PREF_APP` of
+  `application/x-vnd.be.url.slack` = our signature; our type's `META:PPATH` =
+  the script). It opens slack.com/ssb/signin in an R Chromium window.
+- A page in that R Chromium going to `slack://t0test123/magic-login/fakeToken.123`
+  started R Slack through /bin/open. R Slack opened login.html, and the popup
+  called auth.loginMagicBulk for `z-app-T0TEST123-fakeToken.123` (team upper
+  cased). Slack answered `{"ok":true,"token_results":{...:{"ok":false,"error":"invalid_token"}}}`.
+  After 8 s the window went to the client, which showed Slack's sign-in.
+- Not tested: a real token, since there was no account to sign in with.
+
+`RSLACK_RCHROMIUM=<dir>` makes the script use another R Chromium copy, which
+is how the patched build was tried before packaging.
