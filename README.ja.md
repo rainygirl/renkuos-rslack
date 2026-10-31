@@ -2,82 +2,40 @@
 
 [English](README.md) | [한국어](README.ko.md) | [日本語](README.ja.md)
 
-RenkuOS (Haiku) で Slack をブラウザーのツールバーのない専用ウィンドウで開きます。
-R Chromium を使います。サインインは Slack のデスクトップアプリと同じ方式です。
-Web ブラウザー (ツールバーのある R Chromium のウィンドウ) でサインインすると、
-ブラウザーがセッションを R Slack に渡します。
+RenkuOS(Haiku)で Slack を専用ウィンドウで開くアプリです。ブラウザーのツールバーを
+外した R Chromium で動き、Slack のデスクトップアプリと同じくウェブブラウザーで
+サインインしてから、セッションを R Slack に引き継ぎます。
 
 ## pkgman でインストール
 
-```sh
-pkgman add-repo https://pkgman.rainygirl.com/x86_64    # または arm64, x86_gcc2
-pkgman install rslack                                   # R Chromium も一緒に入ります
-```
+| Haiku | コマンド |
+| --- | --- |
+| 32 ビット x86 (x86_gcc2) | `pkgman add-repo https://pkgman.rainygirl.com/x86_gcc2`<br>`pkgman install rslack` |
+| x86_64 | `pkgman add-repo https://pkgman.rainygirl.com/x86_64`<br>`pkgman install rslack` |
+| arm64 | `pkgman add-repo https://pkgman.rainygirl.com/arm64`<br>`pkgman install rslack` |
 
-32 ビット x86 (x86_gcc2) の R Chromium は Chromium 114 で、Slack はこの版をもう
-サポートしていません。R Slack が開くウィンドウ (アプリとサインイン用ブラウザー)
-は user agent で新しい Chrome を名乗ります。rchromium_x86 114.0.5735.199-16 以降
-が必要です。そこでは Slack の表示まで 1、2 分かかります (VAIO P など)。準備が
-できるまでウィンドウには灰色の枠だけが出ます。R Slack は開くときにそう知らせます。
+R Chromium も一緒に入ります。インストール後、Deskbar -> Applications から
+**R Slack** を起動し、**Open the browser** を選んでそのブラウザーでサインイン
+してください。終わるとブラウザーが R Slack に引き継ぎます。
 
-## サインイン
+32 ビット x86 では Slack の表示まで 1、2 分かかります。準備ができるまでウィンドウには
+灰色の枠だけが出ます。
 
-1. Deskbar -> アプリケーションから **R Slack** を起動します。
-2. 初回はどこでサインインするかを尋ねます。**Open the browser** を選ぶと、
-   R Chromium のブラウザーウィンドウで `slack.com/ssb/signin` が開きます。
-3. そこでサインインします。メール、Google、SSO など、ワークスペースで使っている
-   方法でかまいません。
-4. 最後にブラウザーが `slack://` リンクを開き、R Slack がワークスペースと一緒に
-   開きます。
+## ソースからインストール
 
-ワークスペースを追加するには `"/boot/system/apps/RSlack/R Slack" --sign-in` を
-実行して、もう一度サインインします。
-
-**Sign in here** を選ぶと R Slack のウィンドウの中でサインインします。
-
-サインインには Haiku の既定の Web ブラウザーではなく R Chromium を使います。
-RENKU arm64 の既定のブラウザーは WebPositive ですが、そこには WebKit がなく起動
-しません。R Chromium は 154.0.8036.0-15 から `slack://` リンクを Haiku に渡します。WebPositive も、
-知らないスキームへ進むページを Haiku に渡します。
-
-## しくみ
-
-`R Slack` は R Twitter と同じくシェルスクリプトです。R Chromium の
-`content_shell` を `https://app.slack.com/client` で起動し、次のように設定します。
-
-- ツールバーを消します。
-- ウィンドウ名を R Slack にします。
-- プロファイルを別に `~/config/settings/RSlack` に置きます。
-
-起動のたびに `setmime` で `application/x-vnd.Be.URL.slack` の既定アプリケー
-ションとして自分を登録します。Haiku が `slack://` リンクを開くときに探すのは
-この型です。
-
-ブラウザーでのサインインは `slack://<TEAM>/magic-login/<token>[?host=...]` で
-終わります。R Slack はこれを
-`https://app.slack.com/api/auth.loginMagicBulk?magic_tokens=z-app-<TEAM>-<token>&ssb=1`
-に変え、R Chromium にウィンドウなしで先に読み込ませます (`--rch-load-first`)。
-すると Slack が R Slack のプロファイルにセッションの Cookie を保存し、
-そのあとクライアントが開きます。
-
-この変換は [Zlack](https://github.com/sanguneo/zlack/pull/14) が自分の
-クライアントのために見つけた方法です。`slack://channel?team=...&id=...` リンクは
-その会話を開きます。
-
-ブラウザーの出力は `~/config/settings/RSlack/rslack.log` に残り、直前の実行分は
-`.log.1` として残ります。
-
-## ソースからビルド
-
-Haiku で:
+Haiku のマシンで:
 
 ```sh
 make install     # ~/config/non-packaged/apps/RSlack と Deskbar の項目
 ```
 
-`python3 tools/make_icon.py` でアイコンを描き直します。
+## AI 利用の告知
+
+R Slack の一部は AI コーディングツール(Anthropic の Claude)の支援を受けて開発しました。
+すべてのコードは作者がレビューし、テストしています。
 
 ## ライセンス
 
-MIT。Slack とそのロゴは Slack Technologies, LLC の商標です。R Slack は Slack が
-作ったものでも保証したものでもありません。`assets/NOTICE` を見てください。
+MIT。Slack とそのロゴは Slack Technologies, LLC の商標で、R Slack は Slack が作成・
+保証したものではありません。[NOTICE](assets/NOTICE) を参照してください。開発メモは
+[AGENTS.md](AGENTS.md) にあります。
