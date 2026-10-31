@@ -10,7 +10,7 @@ R Chromium으로 동작하며, Slack 데스크톱 앱처럼 웹 브라우저에�
 
 | Haiku | 명령 |
 | --- | --- |
-| 32비트 x86 (x86_gcc2) | `pkgman add-repo https://pkgman.rainygirl.com/x86_gcc2`<br>`pkgman install rslack` |
+| 32비트 x86 (x86_gcc2) | `pkgman add-repo https://pkgman.rainygirl.com/x86_gcc2`<br>`pkgman install rslack_x86` |
 | x86_64 | `pkgman add-repo https://pkgman.rainygirl.com/x86_64`<br>`pkgman install rslack` |
 | arm64 | `pkgman add-repo https://pkgman.rainygirl.com/arm64`<br>`pkgman install rslack` |
 

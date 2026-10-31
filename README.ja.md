@@ -10,7 +10,7 @@ RenkuOS(Haiku)で Slack を専用ウィンドウで開くアプリです。ブ�
 
 | Haiku | コマンド |
 | --- | --- |
-| 32 ビット x86 (x86_gcc2) | `pkgman add-repo https://pkgman.rainygirl.com/x86_gcc2`<br>`pkgman install rslack` |
+| 32 ビット x86 (x86_gcc2) | `pkgman add-repo https://pkgman.rainygirl.com/x86_gcc2`<br>`pkgman install rslack_x86` |
 | x86_64 | `pkgman add-repo https://pkgman.rainygirl.com/x86_64`<br>`pkgman install rslack` |
 | arm64 | `pkgman add-repo https://pkgman.rainygirl.com/arm64`<br>`pkgman install rslack` |
 
